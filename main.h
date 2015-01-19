@@ -26,5 +26,8 @@
 /* Граница Y */
 #define BORD_Y   480/2 - (LINES*BLOCK)/2
 
+void makewindow();
+void engine();
+
 #endif
 
