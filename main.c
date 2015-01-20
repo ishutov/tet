@@ -12,6 +12,36 @@ int defaultLevel;
 /* Номер тетрамино (минимальный, максимальный) */
 int numberBlockMin, numberBlockMax;
 
+/* Следующий тетрамино */
+SDL_Surface *nextTetromino = NULL;
+
+/* Нынешний тетрамино */
+SDL_Surface *currentTetromino = NULL;
+
+/* Номер следующего тетрамино */
+int numberNextTetromino;
+
+/* Номер нынешнего тетрамино */
+int numberCurrentTetromino;
+
+/* Новый экран */
+SDL_Surface *screen_new = NULL;
+
+/* Позиция нынешнего тетрамино */
+SDL_Rect positionOfTetromino;
+
+/* Количество линий */
+int numberLines = 0;
+
+/* Общее количество линий */
+int numberAllLines = 0;
+
+/* Переменная для продолжения игры */
+int stillGo = 1;
+
+/* Счет */
+long score = 0;
+
 int main(int argc, char** argv)
 {
     TTF_Font *font;
@@ -146,6 +176,49 @@ int main(int argc, char** argv)
         }
         while (start != 1);
     }
+    
+    /* Окно игры */
+    makewindow();  
+    do
+    {
+	SDL_Event event;
+	unsigned int ticks;
+        
+	/* Очистка экрана */
+        SDL_Rect clear;
+        clear.x = clear.y = 0;
+        clear.h = screen->h;
+        clear.w = screen->w;
+        SDL_FillRect(screen, &clear, SDL_MapRGB(screen->format, 0,0,0));
+        SDL_Flip(screen);
+
+        /* Движок игры */
+        engine();
+		        
+        ticks = 500 + SDL_GetTicks();
+        while (ticks != SDL_GetTicks())
+        {
+            while (SDL_PollEvent(&event));
+        }
+        if ( SDL_WaitEvent(&event))
+        {
+            /* При нажатии 'R' - заново */
+            if (event.key.keysym.sym == SDLK_r)
+            {
+                score = 0;                
+                numberLines = 0;
+                numberAllLines = 0;
+                stillGo = 1;
+                quit = 0;
+            }
+            else quit = 1;
+        }
+
+    }
+    while (quit == 0);
+	   
+    return EXIT_SUCCESS;
+    
 }
 
 /* Создание окна */
@@ -160,4 +233,19 @@ void makewindow()
 void engine()
 {
 	
+    SDL_Rect currentPositionBlock;	 
+    Uint32 ticks=-DELAY,ticks_keys=0;
+       
+    /* Координаты тетрамино в начале */
+    currentPositionBlock.x = (COLUMNS/2)*BLOCK + BORD_X;
+    currentPositionBlock.y = BORD_Y;
+
+    /* Случайный выбор нынешнего и следующего тетрамино */
+    numberCurrentTetromino=random(numberBlockMin,numberBlockMax);
+    numberNextTetromino=random(numberBlockMin,numberBlockMax);
+    
+    /* Загрузка картинки тетрамино */
+    nextTetromino = loadImage(numberNextTetromino);
+    currentTetromino = loadImage(numberCurrentTetromino);
+
 }
