@@ -248,4 +248,15 @@ void engine()
     nextTetromino = loadImage(numberNextTetromino);
     currentTetromino = loadImage(numberCurrentTetromino);
 
+    /* Интерфейс */
+    drawInterface(screen);
+    drawNextBlock(screen, nextTetromino);
+	
+    /* Повтор */
+    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+
+    /* Новый экран */
+    screen_new = SDL_CreateRGBSurface(SDL_HWSURFACE, screen->w, screen->h, 32, 0, 0, 0, 0);
+    positionOfTetromino.x = positionOfTetromino.y = 0;
+    SDL_BlitSurface(screen, NULL, screen_new, &positionOfTetromino);
 }
