@@ -1,4 +1,8 @@
 #include "main.h"
+#include "random.h"
+#include "image.h"
+#include "draw.h"
+#include "sdlfunc.h"
 
 /* Экран */
 SDL_Surface *screen = NULL;		
