@@ -113,3 +113,49 @@ void drawStats(SDL_Surface *screen, int currentLevel, int linesNextLevel, long s
   textOnScreen = NULL;
 }
 
+/* Рекорд */
+void drawHighscore(SDL_Surface *screen)
+{
+    long highscoreLines, highscoreScore, highscoreLevel;
+    char input[10];
+    char *result;
+    SDL_Surface *text;
+    TTF_Font *font;
+    SDL_Color colorText = {255, 255, 255, 0};
+    SDL_Rect textPosition;
+    char *textOnScreen;
+    
+    /* Файл с рекордом */
+    FILE *file;
+    file = fopen("data/score.txt", "r");
+	
+    /* Счет */    
+    result = fgets(input, sizeof input, file);
+    highscoreScore = strtol(input, NULL, 10);
+
+    /* Линии */
+    result =fgets(input, sizeof input, file);
+    highscoreLines = strtol(input, NULL, 10);
+
+    /* Уровень */
+    result =fgets(input, sizeof input, file);
+    highscoreLevel = strtol(input, NULL, 10);
+    
+    fclose(file);
+	
+    /* Отрисовка рекорда */
+    text = NULL;
+    font = TTF_OpenFont("data/font.ttf", 12);	
+    
+    textOnScreen = (char*)malloc(sizeof(char*) * strlen("BEST SCORE: LEVEL: LINES: ")+10+10+10);
+    sprintf(textOnScreen, "BEST SCORE: %ld LEVEL: %ld LINES: %ld", highscoreScore, highscoreLevel, highscoreLines);
+	
+    text = TTF_RenderText_Solid(font, textOnScreen, colorText);	
+    textPosition.x = screen->w/2 - text->w/2;
+    textPosition.y = screen->h - text->h - SPACE_BTW_TETR_FRAME;
+    SDL_FillRect(screen, &textPosition, SDL_MapRGB(screen->format, 0, 0, 0));
+
+    SDL_BlitSurface(text, NULL, screen, &textPosition);
+	    
+}
+
