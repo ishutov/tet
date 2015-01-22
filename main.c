@@ -46,6 +46,226 @@ int stillGo = 1;
 /* Счет */
 long score = 0;
 
+/* Проверка - может ли двигаться тетрамино */
+SDL_Rect checkBlockMove(SDL_Rect currentPositionBlock, int _x, int _y)
+{
+    SDL_Rect next;	
+    Uint32 pixelsTetromino, pixelsScreen;
+	
+    /* RGB экрана и тетрамино */
+    Uint8 rCompScreen, gCompScreen, bCompScreen;
+    Uint8 rCompBlock, gCompBlock, bCompBlock;
+    int sumCompScreen, sumCompBlock;
+
+    int posX = currentPositionBlock.x;
+    int posY = currentPositionBlock.y;
+    int x, y;       
+    int result = 1;
+        
+    for (x = 0; x < currentTetromino->w; x++)
+    {
+        for (y = 0; y < currentTetromino->h; y++)
+        {
+            /* Проверка на цвет */
+            pixelsTetromino = getPixel(currentTetromino, x, y);
+            SDL_GetRGB(pixelsTetromino, currentTetromino->format, &rCompBlock, &gCompBlock, &bCompBlock);
+            sumCompBlock = rCompBlock + gCompBlock + bCompBlock;
+			            
+            if (sumCompBlock != 0)
+            {
+                /* Окраска в черный */
+                putPixel(screen, posX+x, posY+y, SDL_MapRGB(screen->format, 0, 0, 0));
+            }
+        }
+    }
+	
+    /* Задание местоположения тетрамино */
+    posX = currentPositionBlock.x + _x*BLOCK;
+    posY = currentPositionBlock.y + _y*BLOCK;
+
+     /* Проверка пикселей */	
+    for (x = 0; x < currentTetromino->w; x++)
+    {
+        for (y = 0; y < currentTetromino->h; y++)
+        {            
+            pixelsScreen = getPixel(screen, posX+x, posY+y);
+            pixelsTetromino = getPixel(currentTetromino, x, y);
+            SDL_GetRGB(pixelsScreen, screen->format, &rCompScreen, &gCompScreen, &bCompScreen);
+            SDL_GetRGB(pixelsTetromino, currentTetromino->format, &rCompBlock, &gCompBlock, &bCompBlock);
+
+            sumCompScreen = rCompScreen + gCompScreen + bCompScreen;
+            sumCompBlock = rCompBlock + gCompBlock + bCompBlock;
+			
+            /* Если тетрамино и блок окрашены, невозможно движение */            
+            if ((sumCompBlock != 0) && (sumCompScreen != 0))
+            {
+                result = 0;
+            }
+        }
+    }
+
+    /* Если движение невозможно */
+    if (!result)
+    {
+        /* Отрисовка тетрамино */
+        SDL_BlitSurface(screen, NULL, screen_new, &positionOfTetromino);
+        SDL_BlitSurface(currentTetromino, NULL, screen, &currentPositionBlock);
+
+        /* Если внизу */
+		if (_y == 1)
+        {
+            /* Проверка на заполненные линии */
+            int numberFullLines = verifyFullLine(screen);
+            SDL_BlitSurface(screen, NULL, screen_new, &positionOfTetromino);
+
+            /* Добавление очков */
+            switch (numberFullLines)
+            {
+            case 1:
+                score += (40 * (currentLevel +1));
+                break;
+            case 2:
+                score += (100 * (currentLevel +1));
+                break;
+            case 3:
+                score += (300 * (currentLevel +1));
+                break;
+            case 4:
+                score += (1200 * (currentLevel +1));
+                break;
+            default:
+                break;
+            }
+
+            /* Статистика */
+            numberLines += numberFullLines;
+            numberAllLines += numberFullLines;
+
+            /* Каждый 10 линий - новый уровень */
+            if (numberLines >= 10)
+            {
+                currentLevel += 1;
+                numberLines -= 10;
+            }
+
+            /* Новая статистика */
+            drawStats(screen, currentLevel, numberLines, score);
+
+            /* Новый тетрамино */
+	    next.x = COLUMNS*BLOCK + SPACE_BTW_TETR_FRAME + BLOCK + BLOCK + BORD_X;
+	    next.y = BLOCK + BORD_Y;
+	    next.w = BLOCK * 6;
+	    next.h = BLOCK * 5;            
+            SDL_FillRect(screen, &next, SDL_MapRGB(screen->format, 0, 0, 0));
+			            
+	    currentPositionBlock.x = (COLUMNS/2)*BLOCK + BORD_X;
+	    currentPositionBlock.y = BORD_Y;
+			            
+            numberCurrentTetromino = numberNextTetromino;
+
+            /* Случайный выбор следующего тетрамино, загрузка картинки, отрисовка */
+	    numberNextTetromino=random(numberBlockMin,numberBlockMax);            
+            nextTetromino = loadImage(numberNextTetromino);
+            drawNextBlock(screen, nextTetromino);
+
+            /* Загрузка картинки нынешнего тетрамино */
+            currentTetromino = loadImage(numberCurrentTetromino);
+			
+            /* Проверка на конец игры */
+            if (verifyGameOver(screen, currentTetromino, currentPositionBlock) == 0)
+            {
+                stillGo = 0;
+            }
+        }
+
+    }
+
+    /* Если движение возможно */
+    else
+    {       
+        currentPositionBlock.x += _x*BLOCK;
+	currentPositionBlock.y += _y*BLOCK;
+
+        /* Отрисовка тетрамино с новыми координатами */
+        SDL_BlitSurface(screen, NULL, screen_new, &positionOfTetromino);
+        SDL_BlitSurface(currentTetromino, NULL, screen, &currentPositionBlock);
+    }
+	   
+    screen_new = NULL;   
+    return currentPositionBlock;	    
+}
+
+/* Проверка - может ли поворачиваться тетрамино */
+int checkBlockRotate(SDL_Rect currentPositionBlock, int _numberCurrentTetromino, int _numberNextTetromino)
+{
+    /* Основа из проверки на движение*/
+    int result;   
+    Uint32 pixelsTetromino, pixelsScreen;
+    Uint8 rCompScreen, gCompScreen, bCompScreen;
+    Uint8 rCompBlock, gCompBlock, bCompBlock;    
+    int sumCompScreen, sumCompBlock;
+    int posX = currentPositionBlock.x;
+    int posY = currentPositionBlock.y;
+    int x,y;
+    int rotate = 1;
+	    
+    for (x = 0; x < currentTetromino->w; x++)
+    {
+        for (y = 0; y < currentTetromino->h; y++)
+        {            
+            pixelsTetromino = getPixel(currentTetromino, x, y);
+            SDL_GetRGB(pixelsTetromino, currentTetromino->format, &rCompBlock, &gCompBlock, &bCompBlock);
+            sumCompBlock = rCompBlock + gCompBlock + bCompBlock;
+			         
+            if (sumCompBlock != 0)
+            {            
+                putPixel(screen, posX+x, posY+y, SDL_MapRGB(screen->format, 0, 0, 0));
+            }
+        }
+    }
+	    
+    currentTetromino = loadImage(_numberNextTetromino);
+
+    for (x = 0; x < currentTetromino->w; x++)
+    {
+        for (y = 0; y < currentTetromino->h; y++)
+        {            
+            pixelsScreen = getPixel(screen, posX+x, posY+y);
+            pixelsTetromino = getPixel(currentTetromino, x, y);
+            SDL_GetRGB(pixelsScreen, screen->format, &rCompScreen, &gCompScreen, &bCompScreen);
+            SDL_GetRGB(pixelsTetromino, currentTetromino->format, &rCompBlock, &gCompBlock, &bCompBlock);
+
+            sumCompScreen = rCompScreen + gCompScreen + bCompScreen;
+            sumCompBlock = rCompBlock + gCompBlock + bCompBlock;
+
+            if ((sumCompBlock != 0) && (sumCompScreen != 0))
+            {
+                rotate = 0;
+            }
+        }
+    }
+
+    /* Невозможен поворот */
+    if (!rotate)
+    {        
+        currentTetromino = loadImage(_numberCurrentTetromino);
+        SDL_BlitSurface(screen, NULL, screen_new, &positionOfTetromino);
+        SDL_BlitSurface(currentTetromino, NULL, screen, &currentPositionBlock);        
+        result = 0;
+    }
+    /* Возможен поворот */
+    else
+    {        
+        SDL_BlitSurface(screen, NULL, screen_new, &positionOfTetromino);
+        SDL_BlitSurface(currentTetromino, NULL, screen, &currentPositionBlock);        
+        result = 1;
+    }
+
+    screen_new = NULL;    
+    return result;   
+}
+
+
 int main(int argc, char** argv)
 {
     TTF_Font *font;
