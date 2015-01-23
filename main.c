@@ -1,8 +1,12 @@
 #include "main.h"
+#include "draw.h"
+#include "verify.h"
+#include "sdlfunc.h"
 #include "random.h"
 #include "image.h"
-#include "draw.h"
-#include "sdlfunc.h"
+#include "gameover.h"
+#include "stats.h"
+#include "text.h"
 
 /* Экран */
 SDL_Surface *screen = NULL;		
@@ -263,6 +267,98 @@ int checkBlockRotate(SDL_Rect currentPositionBlock, int _numberCurrentTetromino,
 
     screen_new = NULL;    
     return result;   
+}
+
+/* Событие */
+SDL_Rect checkEvent(SDL_Rect currentPositionBlock)
+{	
+	SDL_Event event;   
+        
+    while ( SDL_PollEvent(&event) )
+    {
+        switch (event.type)
+        {
+            /* Выход */
+        case SDL_QUIT:
+            exit(0);
+            break;
+
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.sym)
+            {
+                /* Движение влево */
+            case SDLK_LEFT:
+                currentPositionBlock = checkBlockMove(currentPositionBlock,  -1, 0);
+                break;
+                /* Движение вправо */
+            case SDLK_RIGHT:
+                currentPositionBlock = checkBlockMove(currentPositionBlock,  1, 0);
+                break;
+                /* Движение вниз */
+            case SDLK_DOWN:
+                currentPositionBlock = checkBlockMove(currentPositionBlock,  0, 1);
+                break;
+                /* Сброс вниз */                
+            case SDLK_SPACE:
+                do
+                {
+                    currentPositionBlock = checkBlockMove(currentPositionBlock,  0, 1);
+                }
+				while (currentPositionBlock.y != BORD_Y);
+                break;
+                /* Поворот тетрамино */                                
+            case SDLK_UP:
+                if (numberCurrentTetromino % 4 == 0)
+                {
+                    if (checkBlockRotate(currentPositionBlock, numberCurrentTetromino, numberCurrentTetromino - 3) == 1)
+                    {
+                        numberCurrentTetromino -=3;
+                    }
+                }
+                else
+                {
+                    if (checkBlockRotate(currentPositionBlock, numberCurrentTetromino, numberCurrentTetromino + 1) == 1)
+                    {
+                        numberCurrentTetromino += 1;
+                    }
+                }
+                break;
+                /* Пауза */
+            case SDLK_p:                
+                pause(screen, 1);
+                SDL_Flip(screen);
+                while (1)
+                {
+                    if (SDL_PollEvent(&event))
+                    {
+                        /* Снятие паузы */
+                        if (event.type == SDL_KEYDOWN)
+                        {
+                            pause(screen, 0);
+                            break;
+                        }
+                    }
+                }
+                break;
+                /* Заново */
+            case SDLK_r:
+                stillGo = 0;
+                break;
+                /* Выход */
+            case SDLK_ESCAPE:
+                exit(0);
+                break;
+            default:
+                break;
+            }
+
+        default:
+            break;
+        }
+
+    }
+    
+    return currentPositionBlock;
 }
 
 
