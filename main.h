@@ -28,6 +28,9 @@
 
 void makewindow();
 void engine();
+SDL_Rect checkEvent(SDL_Rect currentPositionBlock);
+SDL_Rect checkBlockMove(SDL_Rect currentPositionBlock, int _x, int _y);
+int checkBlockRotate(SDL_Rect currentPositionBlock, int _numberCurrentTetromino, int _numberNextTetromino);
 
 #endif
 
