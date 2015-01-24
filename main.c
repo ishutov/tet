@@ -582,7 +582,7 @@ void engine()
     
     /* Основной цикл движка */
     while (stillGo)    
-	{        
+    {        
         if (SDL_GetTicks() >= ticks_keys+DELAY_KEYS)
         {
             ticks_keys = SDL_GetTicks() ;
