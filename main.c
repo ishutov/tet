@@ -116,7 +116,7 @@ SDL_Rect checkBlockMove(SDL_Rect currentPositionBlock, int _x, int _y)
         SDL_BlitSurface(currentTetromino, NULL, screen, &currentPositionBlock);
 
         /* Если внизу */
-		if (_y == 1)
+	if (_y == 1)
         {
             /* Проверка на заполненные линии */
             int numberFullLines = verifyFullLine(screen);
@@ -278,7 +278,7 @@ SDL_Rect checkEvent(SDL_Rect currentPositionBlock)
     {
         switch (event.type)
         {
-            /* Выход */
+        /* Выход */
         case SDL_QUIT:
             exit(0);
             break;
@@ -286,27 +286,27 @@ SDL_Rect checkEvent(SDL_Rect currentPositionBlock)
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym)
             {
-                /* Движение влево */
+            /* Движение влево */
             case SDLK_LEFT:
                 currentPositionBlock = checkBlockMove(currentPositionBlock,  -1, 0);
                 break;
-                /* Движение вправо */
+            /* Движение вправо */
             case SDLK_RIGHT:
                 currentPositionBlock = checkBlockMove(currentPositionBlock,  1, 0);
                 break;
-                /* Движение вниз */
+            /* Движение вниз */
             case SDLK_DOWN:
                 currentPositionBlock = checkBlockMove(currentPositionBlock,  0, 1);
                 break;
-                /* Сброс вниз */                
+            /* Сброс вниз */                
             case SDLK_SPACE:
                 do
                 {
                     currentPositionBlock = checkBlockMove(currentPositionBlock,  0, 1);
                 }
-				while (currentPositionBlock.y != BORD_Y);
+		while (currentPositionBlock.y != BORD_Y);
                 break;
-                /* Поворот тетрамино */                                
+            /* Поворот тетрамино */                                
             case SDLK_UP:
                 if (numberCurrentTetromino % 4 == 0)
                 {
@@ -323,7 +323,7 @@ SDL_Rect checkEvent(SDL_Rect currentPositionBlock)
                     }
                 }
                 break;
-                /* Пауза */
+            /* Пауза */
             case SDLK_p:                
                 pause(screen, 1);
                 SDL_Flip(screen);
@@ -340,11 +340,11 @@ SDL_Rect checkEvent(SDL_Rect currentPositionBlock)
                     }
                 }
                 break;
-                /* Заново */
+            /* Заново */
             case SDLK_r:
                 stillGo = 0;
                 break;
-                /* Выход */
+            /* Выход */
             case SDLK_ESCAPE:
                 exit(0);
                 break;
@@ -579,4 +579,29 @@ void engine()
     screen_new = SDL_CreateRGBSurface(SDL_HWSURFACE, screen->w, screen->h, 32, 0, 0, 0, 0);
     positionOfTetromino.x = positionOfTetromino.y = 0;
     SDL_BlitSurface(screen, NULL, screen_new, &positionOfTetromino);
+    
+    /* Основной цикл движка */
+    while (stillGo)    
+	{        
+        if (SDL_GetTicks() >= ticks_keys+DELAY_KEYS)
+        {
+            ticks_keys = SDL_GetTicks() ;
+            currentPositionBlock = checkEvent(currentPositionBlock);
+        }
+        if (SDL_GetTicks() >= ticks+DELAY)
+        {
+            if ((currentLevel*SPEED) >= DELAY)
+                ticks = SDL_GetTicks()-DELAY;
+            else
+                ticks = SDL_GetTicks() - (currentLevel*SPEED);
+
+            /* Продвижение тетрамино вниз */
+            currentPositionBlock = checkBlockMove(currentPositionBlock, 0, 1);
+        }        
+        SDL_Flip(screen);
+    }
+    
+    /* Конец игры */
+    gameOver(screen, score, numberAllLines, currentLevel);
+    SDL_Flip(screen);
 }
