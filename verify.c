@@ -11,16 +11,16 @@ int verifyFullLine(SDL_Surface *screen)
   int sumCompScreen;	
   int x, y;
 
-	/* Количество заполненных */
+  /* Количество заполненных */
   int count = 0;
-	/* Количество заполненных линий */
+  /* Количество заполненных линий */
   int numberFullLines = 0;
-	/* Проверяемая линия */
+  /* Проверяемая линия */
   SDL_Rect positionLine;
 	        	
   /* Параметры проверяемой линии */
-	positionLine.x = BLOCK + BORD_X;
-	positionLine.y = BORD_Y;
+  positionLine.x = BLOCK + BORD_X;
+  positionLine.y = BORD_Y;
 
   /* Проверка для каждой линии, если ряд окрашен */    
   for (y = 0; y < LINES; y++)
@@ -41,12 +41,12 @@ int verifyFullLine(SDL_Surface *screen)
     /* Если количество равно рядам, то значит, что вся линия заполнена */
     if (count == COLUMNS)
     {
-  	  /* "Сжигание" последней линии */
+      /* "Сжигание" последней линии */
       SDL_Rect Ecr, copEcr;
-		  Ecr.x = copEcr.x = BORD_X;
-		  Ecr.y = BORD_Y;
+      Ecr.x = copEcr.x = BORD_X;
+      Ecr.y = BORD_Y;
       Ecr.w = copEcr.w = COLUMNS*BLOCK + BLOCK;
-		  Ecr.h = copEcr.h = positionLine.y + y*BLOCK - (480/2 - (LINES*BLOCK)/2);
+      Ecr.h = copEcr.h = positionLine.y + y*BLOCK - (480/2 - (LINES*BLOCK)/2);
       copEcr.y = Ecr.y+BLOCK;			            
       SDL_BlitSurface(screen, &Ecr, screen, &copEcr);
 
