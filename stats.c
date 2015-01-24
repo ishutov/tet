@@ -1,11 +1,11 @@
 /* Пауза */
 void pause(SDL_Surface *screen, int yesno)
 {
-	SDL_Color colorText = {255, 255, 255, 0};
+  SDL_Color colorText = {255, 255, 255, 0};
   SDL_Rect textPosition;
-	SDL_Surface *text;
-	TTF_Font *font;
-	char *textOnScreen;
+  SDL_Surface *text;
+  TTF_Font *font;
+  char *textOnScreen;
 	   
   /* Текст паузы */
   text = NULL;
@@ -13,12 +13,12 @@ void pause(SDL_Surface *screen, int yesno)
   textOnScreen = (char*)malloc(sizeof(char*) * strlen("Pause"));	
   sprintf(textOnScreen, "Pause");	
   text = TTF_RenderText_Solid(font, textOnScreen, colorText);	
-	textPosition.x = screen->w/2+220;
-	textPosition.y = 10;
-	textPosition.h = text->h;
-	textPosition.w = text->w;
+  textPosition.x = screen->w/2+220;
+  textPosition.y = 10;
+  textPosition.h = text->h;
+  textPosition.w = text->w;
 	
-	/* 1 - пауза, 0 - снятие с паузы */
+  /* 1 - пауза, 0 - снятие с паузы */
   switch (yesno)
   {        
   case 0:        
@@ -41,11 +41,11 @@ void pause(SDL_Surface *screen, int yesno)
 /* Статистика */
 void drawStats(SDL_Surface *screen, int currentLevel, int linesNextLevel, long score)
 {
-	SDL_Color colorText = {255, 255, 255, 0};
+  SDL_Color colorText = {255, 255, 255, 0};
   SDL_Rect textPosition;
-	TTF_Font *font ;
-	SDL_Surface *text;
-	char *textOnScreen;
+  TTF_Font *font ;
+  SDL_Surface *text;
+  char *textOnScreen;
   text = NULL;
 
   /* Шрифт */
@@ -55,8 +55,8 @@ void drawStats(SDL_Surface *screen, int currentLevel, int linesNextLevel, long s
   textOnScreen = (char*)malloc(sizeof(char*) * 255);
 	
   /* Координаты */
-	textPosition.x = COLUMNS*BLOCK + SPACE_BTW_TETR_FRAME + BLOCK + BORD_X;
-	textPosition.y = BLOCK * 7 + SPACE_BTW_TETR_FRAME + BORD_Y;
+  textPosition.x = COLUMNS*BLOCK + SPACE_BTW_TETR_FRAME + BLOCK + BORD_X;
+  textPosition.y = BLOCK * 7 + SPACE_BTW_TETR_FRAME + BORD_Y;
 
   /* Уровень */
   sprintf(textOnScreen,"Level :");
