@@ -604,4 +604,8 @@ void engine()
     /* Конец игры */
     gameOver(screen, score, numberAllLines, currentLevel);
     SDL_Flip(screen);
+    
+    /* Небольшая пауза */
+    SDL_Delay(100);   
+
 }
