@@ -8,12 +8,12 @@ int verifyGameOver(SDL_Surface *screen, SDL_Surface *currentTetromino, SDL_Rect 
   Uint8 rCompScreen, gCompScreen, bCompScreen;
   Uint8 rCompBlock, gCompBlock, bCompBlock;           
   int sumCompScreen, sumCompBlock;	
-	int posX = currentPositionBlock.x;
+  int posX = currentPositionBlock.x;
   int posY = currentPositionBlock.y;
-	int x,y;      
-	int result = 1;
+  int x,y;      
+  int result = 1;
     
-	/* Проверка пикселей тетрамино */    
+  /* Проверка пикселей тетрамино */    
   for (x = 0; x < currentTetromino->w; x++)
   {
     for (y = 0; y < currentTetromino->h; y++)
@@ -39,13 +39,13 @@ int verifyGameOver(SDL_Surface *screen, SDL_Surface *currentTetromino, SDL_Rect 
 /* Конец игры */
 void gameOver(SDL_Surface *screen, long score, int numberFullLines, int currentLevel)
 {
-	SDL_Color colorText = {255, 255, 0, 0};
+  SDL_Color colorText = {255, 255, 0, 0};
   SDL_Rect textPosition;
-	long highscoreLines, highscoreScore, highscoreLevel;
+  long highscoreLines, highscoreScore, highscoreLevel;
   char input[10];
-	char *result;
-	FILE *file;
-	char *textOnScreen;       
+  char *result;
+  FILE *file;
+  char *textOnScreen;       
   SDL_Surface *text = NULL;
 
   /* Загрузка шрифта */
@@ -67,26 +67,26 @@ void gameOver(SDL_Surface *screen, long score, int numberFullLines, int currentL
 	    
   /* Лучший счет */    
   result = fgets(input, sizeof input, file);
-	highscoreScore = strtol(input, NULL, 10);
+  highscoreScore = strtol(input, NULL, 10);
 
   /* Лучшие линии */
-	result =fgets(input, sizeof input, file);
+  result =fgets(input, sizeof input, file);
   highscoreLines = strtol(input, NULL, 10);
 
   /* Лучший уровень */
   result =fgets(input, sizeof input, file);
-	highscoreLevel = strtol(input, NULL, 10);
+  highscoreLevel = strtol(input, NULL, 10);
     
-	fclose(file);
+  fclose(file);
 	
   /* Проверка на побитие рекорда */
   if (highscoreScore < score)
   {
     /* Запись нового рекорда */
     FILE *newfile;
-		SDL_Color colorText = {255, 255, 0, 0};
+    SDL_Color colorText = {255, 255, 0, 0};
     SDL_Rect textPosition;
-		newfile = fopen("data/score2.txt", "w");
+    newfile = fopen("data/score2.txt", "w");
     fprintf(newfile, "%ld\n%d\n%d\n",score, numberFullLines, currentLevel);
 
     /* Надпись нового рекорда */
@@ -105,9 +105,9 @@ void gameOver(SDL_Surface *screen, long score, int numberFullLines, int currentL
 
     fclose(newfile);
 
-		/* Сохранение нового файла */
-		remove("data/score.txt");
-		rename("data/score2.txt", "data/score.txt");
+     /* Сохранение нового файла */
+    remove("data/score.txt");
+    rename("data/score2.txt", "data/score.txt");
   }
 
   /* Старт заново */
